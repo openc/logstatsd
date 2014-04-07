@@ -1,0 +1,3 @@
+argparse==1.2.1
+-e git+ssh://git@github.com/etsy/logster.git@7475c53822c2e22d0994ea059bfd482044019a5b#egg=logster-master
+wsgiref==0.1.2
