@@ -56,5 +56,5 @@ class HAProxyLogster(LogsterParser):
             timePerReq = 0
         return [
             MetricObject("haproxy.blocks", self.unblocks, metric_type="c"),
-            MetricObject("openc.production.haproxy.responsetime", str(timePerReq), metric_type="ms")
+            MetricObject("haproxy.responsetime", str(timePerReq), metric_type="ms")
         ]
