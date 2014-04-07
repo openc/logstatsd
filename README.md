@@ -1,5 +1,6 @@
 To install:
 
+    apt-get install python-virtualenv
     virtualenv env.
     pip install -r < requirements.txt
 
