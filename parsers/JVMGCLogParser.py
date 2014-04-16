@@ -1,12 +1,13 @@
-###  A logster parser file that can be used to count the number
-###  of sent/deferred/bounced emails from a Postfix log, along with
-### some other associated statistics.
+###  A logster parser file that can be used to measure GC pauses from
+### a suitable log
 ###
-###  For example:
-###  sudo ./logster --dry-run --output=ganglia PostfixParser /var/log/maillog
-###
-###
-###  Copyright 2011, Bronto Software, Inc.
+### You'll need to add the following GC options to your tomcat startup script:
+### export JAVA_OPTS="$JAVA_OPTS -Xloggc:/opt/tomcat7/logs/garbage-collection.log"
+### export JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCDetails"
+### export JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCTimeStamps"
+### export JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCApplicationStoppedTime"
+
+###  Copyright 2014, OpenCorporates
 ###
 ###  This parser is free software: you can redistribute it and/or modify
 ###  it under the terms of the GNU General Public License as published by
