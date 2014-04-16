@@ -28,27 +28,38 @@ from logster.logster_helper import LogsterParsingException
 class JVMGCLogParser(LogsterParser):
 
     def __init__(self, option_string=None):
-        self.time = 0
-        self.count = 0.0
-        self.regex = re.compile("""
-        (.*Rescan\ \(parallel\).*real=([0-9.]+)\ secs|
-        .*concurrent\ mode\ failure.*real=([0-9.]+)\ secs|
-        .*Full\ GC.*real=([0-9.]+)\ secs)""", re.VERBOSE)
+        self.pause_time = 0
+        self.pause_count = 0.0
+        self.stop_time = 0
+        self.stop_count = 0.0
+        self.pause_regex = re.compile(""".*
+        (Rescan\ \(parallel\).*real=([0-9.]+)\ secs|
+        concurrent\ mode\ failure.*real=([0-9.]+)\ secs|
+        Full\ GC.*real=([0-9.]+)\ secs)""", re.VERBOSE)
+        self.stop_regex = re.compile(""".*threads were stopped: ([0-9.]+) seconds""")
 
     def parse_line(self, line):
+        errors = []
         try:
-            # Apply regular expression to each line and extract
-            # interesting bits.
-            time = self.regex.match(line).groups()[1]
-            self.time += float(time)
-            self.count += 1
+            pause_time = self.pause_regex.match(line).groups()[1]
+            self.pause_time += float(pause_time)
+            self.pause_count += 1
         except Exception, e:
-            raise LogsterParsingException, "regmatch or contents failed with %s" % e
-
+            errors.append("1: %s" % e)
+        try:
+            stop_time = self.stop_regex.match(line).groups()[0]
+            self.stop_time += float(stop_time)
+            self.stop_count += 1
+        except Exception, e:
+            errors.append("2: %s" % e)
+        if errors:
+            raise LogsterParsingException, "regmatch or contents failed with %s" % errors
 
     def get_state(self, duration):
         # Return a list of metrics objects
         return [
-            MetricObject("logs.jvm.gc.pause.count", self.count, metric_type="c"),
-            MetricObject("logs.jvm.gc.pause", str(self.time * 1000), metric_type="ms")
+            MetricObject("logs.jvm.gc.pause", self.pause_count, metric_type="c"),
+            MetricObject("logs.jvm.gc.pause", str(self.pause_time * 1000), metric_type="ms"),
+            MetricObject("logs.jvm.gc.stop", self.stop_count, metric_type="c"),
+            MetricObject("logs.jvm.gc.stop", str(self.stop_time * 1000), metric_type="ms")
         ]
